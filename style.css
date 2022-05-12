@@ -11,6 +11,7 @@ body {
     margin: 0;
 }
 
+/* Game board */
 .board {
     width: 100vw;
     height: 100vh;
@@ -52,7 +53,9 @@ body {
 }
 
 .cell.x::before,
-.cell.x::after {
+.cell.x::after,
+.board.x .cell:not(.x):not(.circle):hover::before,
+.board.x .cell:not(.x):not(.circle):hover::after {
     content: "";
     height: var(--icon-size);
     width: calc(var(--icon-size) *  0.1);
@@ -60,16 +63,25 @@ body {
     position: absolute;
 }
 
-.cell.x::before {
+.board.x .cell:not(.x):not(.circle):hover::before,
+.board.x .cell:not(.x):not(.circle):hover::after {
+    background-color: rgb(151, 149, 149);
+}
+
+.cell.x::before,
+.board.x .cell:not(.x):not(.circle):hover::before {
     transform: rotate(45deg);
 }
 
-.cell.x::after {
+.cell.x::after,
+.board.x .cell:not(.x):not(.circle):hover::after {
     transform: rotate(-45deg);
 }
 
 .cell.circle::before,
-.cell.circle::after {
+.cell.circle::after,
+.board.circle .cell:not(.x):not(.circle):hover::before,
+.board.circle .cell:not(.x):not(.circle):hover::after {
     content: "";
     height: calc(var(--icon-size) * 0.95);
     width: calc(var(--icon-size) * 0.95);
@@ -78,7 +90,8 @@ body {
     border-radius: 50%;
 }
 
-.cell.circle::after {
+.cell.circle::after,
+.board.circle .cell:not(.x):not(.circle):hover::after {
     content: "";
     height: calc(var(--icon-size) * 0.75);
     width: calc(var(--icon-size)* 0.75);
@@ -90,4 +103,46 @@ body {
 .cell.x,
 .cell.circle {
     cursor: not-allowed;
+}
+
+.board.circle .cell:not(.x):not(.circle):hover::before {
+    background-color: rgb(151, 149, 149);
+}
+
+/* Winning message */
+.winner-screen {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background-color: rgba(0, 0, 0, 0.9);
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.winner-message {
+    font-size: 3.5rem;
+    color: white;
+}
+
+.winner-screen button {
+    font-size: 2.5rem;
+    padding: 8px 16px;
+    border: 2px solid black;
+    border-radius: 10px;
+    background-color: white;
+    color: black;
+}
+
+.winner-screen button:hover {
+    background-color: black;
+    color: white;
+    cursor: pointer;
+}
+
+.winner-screen.show {
+    display: flex;
 }
