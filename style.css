@@ -4,6 +4,7 @@
 
 :root {
     --cell-size: 100px;
+    --icon-size: calc(var(--cell-size) * 0.90)
 }
 
 body {
@@ -23,6 +24,11 @@ body {
     height: var(--cell-size);
     width: var(--cell-size);
     border: 1px solid black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    cursor: pointer;
 }
 
 .cell:first-child, 
@@ -43,4 +49,45 @@ body {
 .cell:nth-child(8), 
 .cell:last-child {
     border-bottom: none;
+}
+
+.cell.x::before,
+.cell.x::after {
+    content: "";
+    height: var(--icon-size);
+    width: calc(var(--icon-size) *  0.1);
+    background-color: black;
+    position: absolute;
+}
+
+.cell.x::before {
+    transform: rotate(45deg);
+}
+
+.cell.x::after {
+    transform: rotate(-45deg);
+}
+
+.cell.circle::before,
+.cell.circle::after {
+    content: "";
+    height: calc(var(--icon-size) * 0.95);
+    width: calc(var(--icon-size) * 0.95);
+    background-color: black;
+    position: absolute;
+    border-radius: 50%;
+}
+
+.cell.circle::after {
+    content: "";
+    height: calc(var(--icon-size) * 0.75);
+    width: calc(var(--icon-size)* 0.75);
+    background-color: white;
+    position: absolute;
+    border-radius: 50%;
+}
+
+.cell.x,
+.cell.circle {
+    cursor: not-allowed;
 }
