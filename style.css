@@ -141,6 +141,7 @@ body {
     background-color: black;
     color: white;
     cursor: pointer;
+    border: 2px solid white;
 }
 
 .winner-screen.show {
