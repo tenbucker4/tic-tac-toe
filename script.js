@@ -37,13 +37,16 @@ const boardDisplay = (() => {
 // Listen for a single click on each cell
 const gameCells = document.querySelectorAll(".cell");
 gameCells.forEach(cell => {
-    cell.addEventListener("click", logClick, { once: true });
+    cell.addEventListener("click", logClick);
 });
 
 // Target cell that was clicked, place a marker at target cell according to what
 // current active marker is (default is X), change the player, and the alternate
 // the hover effect for the game board
 function logClick(e) {
+    if (e.target.classList.contains("x") || e.target.classList.contains("circle")) {
+        return;
+    }
     const cell = e.target;
     console.log("click occurred");
     placeMarker(cell, activeMarker, boardHover);
@@ -127,4 +130,25 @@ function checkWinner() {
             }
         }
     }
+}
+
+// Restart game when Play Again button is clicked
+playAgainButton.addEventListener("click", playAgain())
+function playAgain () {
+    console.log("play again button was clicked");
+    activeMarker = player1.marker;
+    boardHover.classList.remove(activeHoverState);
+    activeHoverState = "x";
+    boardHover.classList.add(activeHoverState);
+    gameCells.forEach(cell => {
+        if (cell.classList.contains("x")) {
+            cell.classList.remove("x");
+        } else if (cell.classList.contains("circle")) {
+            cell.classList.remove("circle");
+        }
+    });
+    board = [];
+    xMoves = [];
+    circleMoves = [];
+    document.querySelector(".winner-screen").style.display = "none";
 }
