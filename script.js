@@ -6,15 +6,38 @@ const createPlayer = (player, marker) => {
 // Create variables for players consisting of names and markers, and the current active marker (X or O)
 const player1 = createPlayer("Player 1", "x")
 const player2 = createPlayer("Player 2", "circle");
-let activeMarker = player1.marker;
-let activeHoverState = "x";
+const allCells = document.querySelectorAll("[data-cell]");
+let xTurn = true;
+let boardHover = document.querySelector(".board");
 const gameEndScreen = document.querySelector(".winner-screen");
 const winnerMessage = document.querySelector(".winner-message");
-const playAgainButton = document.querySelector(".play-again");
+const playAgainButton = document.getElementById("restart");
+const winningBoards = [
+    [0, 1, 2],
+    [3, 4, 5],
+    [6, 7, 8],
+    [0, 3, 6],
+    [1, 4, 7],
+    [2, 5, 8],
+    [0, 4, 8],
+    [2, 4, 6]
+];
 
-// Adds class to the gameboard to display X or O in hover, alternating with each click
-let boardHover = document.querySelector(".board");
-boardHover.classList.add(activeHoverState);
+function initializeGame() {
+    allCells.forEach(cell => {
+        cell.classList.remove(player1.marker);
+        cell.classList.remove(player2.marker);
+    });
+    boardHover.classList.remove(player1.marker);
+    boardHover.classList.remove(player2.marker);
+    boardHover.classList.add(player1.marker);
+
+    allCells.forEach(cell => {
+        cell.addEventListener("click", logClick);
+    });
+    document.querySelector(".winner-screen").style.display = "none";
+}
+
 
 // Game board logic module
 const gameLogic = (() => {
@@ -32,123 +55,77 @@ const boardDisplay = (() => {
     return {
 
     };
-})
+})();
 
-// Listen for a single click on each cell
-const gameCells = document.querySelectorAll(".cell");
-gameCells.forEach(cell => {
-    cell.addEventListener("click", logClick);
-});
 
 // Target cell that was clicked, place a marker at target cell according to what
 // current active marker is (default is X), change the player, and the alternate
 // the hover effect for the game board
+
 function logClick(e) {
     if (e.target.classList.contains("x") || e.target.classList.contains("circle")) {
         return;
     }
     const cell = e.target;
-    console.log("click occurred");
-    placeMarker(cell, activeMarker, boardHover);
-
-    if (activeMarker == player1.marker) {
-        xMoves.push(e.target.id);
-        xMoves.sort();
-        board.push(xMoves);
+    const currentClass = xTurn ? player1.marker : player2.marker;
+    placeMarker(cell, currentClass);
+    if (checkWin(currentClass)) {
+        endGame(false)
+    } else if (checkDraw()) {
+        endGame(true)
     } else {
-        circleMoves.push(e.target.id);
-        circleMoves.sort();
-        board.push(circleMoves);
+        changePlayer();
+        changeHover();
     }
-
-    checkWinner();
-    changePlayer();
-    toggleBoardHoverState();
 }
 
-function placeMarker(cell, activeMarker) {
-    cell.classList.add(activeMarker);
+// Place X or O at target cell
+function placeMarker(cell, currentClass) {
+    cell.classList.add(currentClass);
 }
 
 // Alternate active marker after each click
 function changePlayer() {
-    if (activeMarker == player1.marker) {
-        activeMarker = player2.marker;
-    } else if (activeMarker == player2.marker) {
-        activeMarker = player1.marker;
-    }
+    xTurn = !xTurn;
 }
 
 // Alternate board hover display after each click
-function toggleBoardHoverState() {
-    boardHover.classList.remove(activeHoverState);
-
-    if (activeHoverState === "x") {
-        activeHoverState = "circle";
-        boardHover.classList.add(activeHoverState);
+function changeHover() {
+    boardHover.classList.remove(player1.marker);
+    boardHover.classList.remove(player2.marker);
+    if (xTurn) {
+        boardHover.classList.add(player1.marker);
     } else {
-        activeHoverState = "x";
-        boardHover.classList.add(activeHoverState);
+        boardHover.classList.add(player2.marker);
     }
 }
 
-// Define current board state and possible winning board states
-let board = [];
-const winningBoards = [
-    "012",
-    "345",
-    "678",
-    "036",
-    "147",
-    "258",
-    "048",
-    "246"
-];
+// check for any possible win conditions
+function checkWin(currentClass) {
+    return winningBoards.some(item => {
+        return item.every(index => {
+            return allCells[index].classList.contains(currentClass)
+        })
+    })
+}
 
-let xMoves = [];
-let circleMoves = [];
+// check if all cells are populated with no win conditions met
+function checkDraw() {
+    return [...allCells].every(cell => {
+        return cell.classList.contains(player1.marker) || cell.classList.contains(player2.marker)
+    })
+}
 
-// Check if any of the entries within winningBoards matches any entries in the current game board.
-// If so, declare a winner
-function checkWinner() {
-    let boardStrings = [];
-    for (let i = 0; i < board.length; i++) {
-        let str = board[i].join("");
-        boardStrings.push(str);
-    }
-    console.log(boardStrings);
-    console.log(winningBoards);
-    for (let i = 0; i < boardStrings.length; i++) {
-        for (let j = 0;  j < winningBoards.length; j++) {
-            if (boardStrings[i] === winningBoards[j]) {
-                document.querySelector(".winner-screen").style.display = "flex";
-                if (activeMarker == player1.marker) {
-                    winnerMessage.textContent = "Player 1 Wins!"
-                } else {
-                    winnerMessage.textContent = "Player 2 Wins!"
-                }
-            }
-        }
+// End game with draw or no draw
+function endGame(draw) {
+    document.querySelector(".winner-screen").style.display = "flex";
+    if (draw) {
+        winnerMessage.textContent = "It's a tie.";
+    } else if (xTurn) {
+        winnerMessage.textContent = "Player 1 Wins!";
+    } else {
+        winnerMessage.textContent = "Player 2 Wins!";
     }
 }
 
-// Restart game when Play Again button is clicked
-playAgainButton.addEventListener("click", playAgain())
-function playAgain () {
-    console.log("play again button was clicked");
-    activeMarker = player1.marker;
-    boardHover.classList.remove(activeHoverState);
-    activeHoverState = "x";
-    boardHover.classList.add(activeHoverState);
-    gameCells.forEach(cell => {
-        if (cell.classList.contains("x")) {
-            cell.classList.remove("x");
-        } else if (cell.classList.contains("circle")) {
-            cell.classList.remove("circle");
-        }
-    });
-    board = [];
-    xMoves = [];
-    circleMoves = [];
-    document.querySelector(".winner-screen").style.display = "none";
-}
+window.onload = initializeGame();
